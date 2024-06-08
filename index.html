@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Chatbot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<style>
+    body {
+    background-color: #f4f7f6;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+.container-fluid {
+    padding: 0;
+}
+
+#chat-container {
+    background-color: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.message {
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0;
+    max-width: 80%;
+}
+
+.user-message {
+    background-color: #d1e7dd;
+    align-self: flex-end;
+    text-align: right;
+}
+
+.bot-message {
+    background-color: #f8d7da;
+    align-self: flex-start;
+}
+
+.input-group {
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+    padding: 10px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.input-group .form-control {
+    border-radius: 0;
+}
+
+.input-group-append .btn {
+    border-radius: 0;
+    background-color: #007bff;
+    color: white;
+}
+
+.input-group-append .btn:hover {
+    background-color: #0056b3;
+}
+
+p {
+    margin: 0;
+}
+
+</style>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">Chat Bot Hỗ Trợ Giảng Viên Trong Việc Tạo Câu Hỏi Trắc Nghiệm</a>
+    </nav>
+    <div class="container-fluid d-flex flex-column vh-100">
+        <div id="chat-container" class="flex-grow-1 overflow-auto p-3">
+        </div>
+        <div class="input-group p-3 bg-light">
+            <input type="text" id="user-input" class="form-control" placeholder="Type your message...">
+            <div class="input-group-append">
+                <button class="btn btn-primary" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var message = document.getElementById("user-input").value;
+            if (message.trim() === "") return; // Do not send empty messages
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+                    if (xmlhttp.status == 200) {
+                        var response = xmlhttp.responseText;
+                        var chatContainer = document.getElementById("chat-container");
+                        chatContainer.innerHTML += "<div class='message user-message'><strong>You:</strong> " + message + "</div>";
+                        chatContainer.innerHTML += "<div class='message bot-message'><strong>Bot:</strong> " + response + "</div>";
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                        document.getElementById("user-input").value = "";
+                    }
+                }
+            };
+            xmlhttp.open("GET", "/get?msg=" + message, true);
+            xmlhttp.send();
+        }
+
+        // Send message on Enter key press
+        document.getElementById("user-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
